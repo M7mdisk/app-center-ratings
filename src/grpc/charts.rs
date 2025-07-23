@@ -1,15 +1,15 @@
 use crate::{
     conn,
     db::{Category, Timeframe, VoteSummary},
-    grpc::app::populate_chart_data_with_names,
+    grpc::populate_chart_data_with_names,
     proto::{
         chart::{
             chart_server::{self, ChartServer},
             GetChartRequest, GetChartResponse,
         },
-        common::{ChartData as PbChartData, Rating as PbRating, RatingsBand as PbRatingsBand},
+        common::{Rating as PbRating, RatingsBand as PbRatingsBand},
     },
-    ratings::{Chart, ChartData, Rating, RatingsBand},
+    ratings::{Chart, Rating, RatingsBand},
     Context,
 };
 use cached::proc_macro::cached;
@@ -92,20 +92,8 @@ async fn get_chart_cached(
     Ok(Chart::new(timeframe, summaries))
 }
 
-impl PbChartData {
-    pub fn from_chart_data_and_snap_name(chart_data: ChartData, snap_name: String) -> Self {
-        Self {
-            raw_rating: chart_data.raw_rating,
-            rating: Some(PbRating::from_rating_and_snap_name(
-                chart_data.rating,
-                snap_name,
-            )),
-        }
-    }
-}
-
 impl PbRating {
-    fn from_rating_and_snap_name(rating: Rating, snap_name: String) -> Self {
+    pub fn from_rating_and_snap_name(rating: Rating, snap_name: String) -> Self {
         Self {
             snap_id: rating.snap_id,
             total_votes: rating.total_votes,
